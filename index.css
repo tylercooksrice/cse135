@@ -9,11 +9,11 @@ body {
     justify-content: space-between; /* Push items to opposite ends */
     align-items: center;        /* Align vertically in the middle */
 
-    aside {
-        background-color: #eee;
-    }
   }
   
+  aside {
+    background-color: #eee;
+}
 
   h1 {
     font-weight: bold;
