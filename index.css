@@ -7,7 +7,7 @@ body {
   header {
     display: flex;              /* Enable flexbox layout */
     justify-content: space-between; /* Push items to opposite ends */
-    align-items: center;        /* Align vertically in the middle */
+
 
   }
   
@@ -16,10 +16,9 @@ body {
 }
 
   h1 {
-    top: 0;
+    margin-top: 0;
     font-weight: bold;
     font-size: 2.2rem;
-    margin-bottom: 0;
   }
 
   h2 {
