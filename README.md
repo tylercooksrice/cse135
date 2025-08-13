@@ -1,3 +1,13 @@
+## Members
+
+Tyler Khuc
+Akhil Subbaro
+
+# Grader Information
+
+acc: grader@178.128.179.204
+pwd: grader1234
+
 ## Deployment Setup
 
 - Hosting: DigitalOcean Droplet
