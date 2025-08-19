@@ -3,7 +3,7 @@
 use JSON;
 
 print "Cache-Control: no-cache\n";
-print "Content-type: application/json\n\n";
+print "Content-type: application/json\n";
 
 $date = localtime();
 $address = $ENV{REMOTE_ADDR};
