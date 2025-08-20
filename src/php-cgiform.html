@@ -1,4 +1,3 @@
-
 <!doctype html>
 <html>
 
@@ -9,13 +8,19 @@
 <body>
   <h1 align="center">Session Test</h1>
   <hr>
-  <label for="cgi-lang">CGI using php</label>
-  <form action="cgi-bin/php-sessions-1.cgi" method="Post" id="form">
+ <form method="post" id="form">
+    CGI using:
+    <select name="lang" onchange="document.getElementById('form').action=this.value;">
+      <option value="php-sessions-1.php">PHP (Cookie)</option>
+      <option value="php-sessions-1-url.php">PHP (URL)</option>
+    </select>  
+    <form action="cgi-bin/php-sessions-1.php" method="Post" id="form">
+    <br>
     <label>What is your name? <input type="text" name="username" autocomplete="off"></label>
     <br>
     <input type="submit" value="Test Sessioning">
   </form>
-
+  
   <a href="/" style="display:inline-block;margin-top:20px;">Home</a> 
 
 </body>
