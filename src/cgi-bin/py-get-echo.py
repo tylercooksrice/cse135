@@ -1,11 +1,25 @@
 #!/usr/bin/env python3
-import os
 import cgi
+import os
 
-print("Content-Type: text/html\n")
+print("Content-Type: text/html")
+print()
+
+print("""
+<html><head><title>GET query string</title></head>
+<body><h1 align=center>GET query string</h1>
+<hr/>
+""")
+
+query_string = os.environ.get('QUERY_STRING', '')
+print(f"Raw query string: {cgi.escape(query_string)}<br/><br/>")
+
 form = cgi.FieldStorage()
+print("<table border=1 cellpadding=5> Formatted Query String:")
 
-print("<html><body><h2>GET Echo</h2><ul>")
 for key in form.keys():
-    print(f"<li>{key}: {form.getvalue(key)}</li>")
-print("</ul></body></html>")
+    value = form.getvalue(key)
+    print(f"<tr><td>{cgi.escape(key)}:</td><td>{cgi.escape(value)}</td></tr>")
+
+print("</table>")
+print("</body></html>")

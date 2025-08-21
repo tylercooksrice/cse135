@@ -1,22 +1,26 @@
 #!/usr/bin/env python3
 import cgi
-import os
 import datetime
+import os
 
-print("Cache-Control: no-cache")
-print("Content-type: text/html\n")
+print("Content-Type: text/html")
+print()
 
-print("<html>")
-print("<head><title>Hello, Python!</title></head>")
-print("<body>")
-print("<h1>Hello, Python!</h1>")
-print("<p>This page was generated with the Python programming language</p>")
+print("""
+<!DOCTYPE html>
+<html>
+<body>
+    <h1>Hello, Python!</h1>
+    <p>This page was generated with Python!</p>
+""")
 
-datetime = datetime.datetime.now()
-print(f"<p>Current Time: {datetime}</p>")
+date_string = datetime.datetime.now().strftime("%a %b %d %H:%M:%S %Y")
+ip_address = os.environ.get('REMOTE_ADDR', 'Unknown')
 
-ip = os.environ.get("REMOTE_ADDR", "Unknown")
-print(f"<p>Your IP Address: {ip}</p>")
+print(f"<p>Current Time: {date_string}</p>")
+print(f"<p>Your IP address is: {ip_address}</p>")
 
-print("</body>")
-print("</html>")
+print("""
+</body>
+</html>
+""")

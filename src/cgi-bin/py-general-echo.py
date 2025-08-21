@@ -1,28 +1,25 @@
 #!/usr/bin/env python3
-import http.cookies
-import datetime
+import cgi
+import os
 
-# Expire the cookie to "destroy" the session
-cookie = http.cookies.SimpleCookie()
-cookie["username"] = ""
-cookie["username"]["path"] = "/"
-cookie["username"]["expires"] = (datetime.datetime.utcnow() - datetime.timedelta(days=1)).strftime("%a, %d-%b-%Y %H:%M:%S GMT")
-
-# Print headers
 print("Content-Type: text/html")
-print(cookie.output())
 print()
 
-# HTML page
 print("""
-<html>
-<head>
-  <title>Python Session Destroyed</title>
-</head>
-<body>
-  <h1>Session Destroyed</h1>
-  <a href="/session.html">Back to the Session Form</a><br />
-  <a href="/index.html">Back to Home</a><br />
-</body>
-</html>
+<!DOCTYPE html>
+<html><head><title>General Request Echo</title></head>
+<body><h1 align="center">General Request Echo</h1>
+<hr>
 """)
+
+protocol = os.environ.get('SERVER_PROTOCOL', '')
+method = os.environ.get('REQUEST_METHOD', '')
+query = os.environ.get('QUERY_STRING', '')
+body = sys.stdin.read()
+
+print(f"<p><b>HTTP Protocol:</b> {cgi.escape(protocol)}</p>")
+print(f"<p><b>HTTP Method:</b> {cgi.escape(method)}</p>")
+print(f"<p><b>Query String:</b> {cgi.escape(query)}</p>")
+print(f"<p><b>Message Body:</b> {cgi.escape(body)}</p>")
+
+print("</body></html>")

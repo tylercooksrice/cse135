@@ -1,28 +1,23 @@
 #!/usr/bin/env python3
 import http.cookies
-import datetime
 
-# Expire the cookie to "destroy" the session
-cookie = http.cookies.SimpleCookie()
-cookie["username"] = ""
-cookie["username"]["path"] = "/"
-cookie["username"]["expires"] = (datetime.datetime.utcnow() - datetime.timedelta(days=1)).strftime("%a, %d-%b-%Y %H:%M:%S GMT")
-
-# Print headers
 print("Content-Type: text/html")
+cookie = http.cookies.SimpleCookie()
+cookie['session_id'] = ''
+cookie['session_id']['expires'] = 'Thu, 01 Jan 1970 00:00:00 GMT'
 print(cookie.output())
 print()
 
-# HTML page
 print("""
+<!DOCTYPE html>
 <html>
 <head>
   <title>Python Session Destroyed</title>
 </head>
 <body>
   <h1>Session Destroyed</h1>
-  <a href="/session.html">Back to the Session Form</a><br />
-  <a href="/index.html">Back to Home</a><br />
+  <a href="/cgiform.html">Back to Form</a><br>
+  <a href="/cgi-bin/py-state-demo.py">Back to Python Session Page</a>
 </body>
 </html>
 """)

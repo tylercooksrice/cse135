@@ -1,20 +1,15 @@
 #!/usr/bin/env python3
-import os
-import datetime
 import json
+import datetime
+import os
 
-print("Cache-Control: no-cache")
-print("Content-type: application/json\n")
-
-datetime = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-ipaddress = os.environ.get("REMOTE_ADDR", "Unknown")
-
-message = {
-    "title": "Hello, Python!",
-    "heading": "Hello, Python!",
-    "message": "This page was generated with the Python programming language",
-    "time": datetime,
-    "IP": ipaddress
+data = {
+    "message": "Hello World from Python!",
+    "date": datetime.datetime.now().strftime("%a %b %d %H:%M:%S %Y"),
+    "ipAddress": os.environ.get('REMOTE_ADDR', 'Unknown')
 }
 
-print(json.dumps(message))
+print("Content-Type: application/json")
+print()
+
+print(json.dumps(data))
