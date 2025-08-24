@@ -19,3 +19,6 @@ pwd: grader1234
   3. GitHub Actions connects via SSH to droplet and runs `git pull`.
   4. Site updates automatically.
 - See `Github-Deploy.mp4` for demo.
+
+## Link for Homework 2
+[akhils.site](https://akhils.site/src/)
