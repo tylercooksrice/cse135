@@ -1,13 +1,12 @@
 #!/usr/bin/env python3
-import cgi
 import datetime
 import os
 
-print("Cache-Control: no-cache\n)
+print("Cache-Control: no-cache\n")
 print("Content-Type: text/html\n\n")
 
+print("<!DOCTYPE html>")
 print("""
-<!DOCTYPE html>
 <html>
 <head>
     <title>Hello Python World</title>
@@ -15,6 +14,7 @@ print("""
 <body>
     <h1>Hello, Python!</h1>
     <p>This page was generated with Python!</p>
+
 """)
 
 date_string = datetime.datetime.now().strftime("%a %b %d %H:%M:%S %Y")
