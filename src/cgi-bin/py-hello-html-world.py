@@ -2,7 +2,7 @@
 import datetime
 import os
 
-print("Cache-Control: no-cache\n")
+print("Cache-Control: no-cache")
 print("Content-Type: text/html\n\n")
 
 print("<!DOCTYPE html>")
