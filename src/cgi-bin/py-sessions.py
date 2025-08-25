@@ -26,5 +26,5 @@ else:
     print()
     print(f"<html><body><h2>Welcome back, {saved_user}!</h2>")
 
-print('<a href="/session.html">Go back</a> | <a href="/index.html">Home</a>')
+print('<a href="/session.html">Go back</a> | <a href="/src/index.html">Home</a>')
 print("</body></html>")
