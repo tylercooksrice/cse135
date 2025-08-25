@@ -8,20 +8,19 @@ print("Content-Type: text/html\n\n")
 form = cgi.FieldStorage()
 print("<!DOCTYPE html>")
 print("""
-<html>
-<head>
-    <title>Python Post</title>
-</head>
+<html><head><title>POST Message Body</title></head>
+      <body><h1 align=center>POST Message Body</h1>
+      <hr/>
 <body>""")
-print("<h1>POST Data</h1>")
+print("<p>Message Body:</p><br>")
 print("<ul>")
 for key in form.keys():
     print(f"<li>{key} = {form.getvalue(key)}</li>")
 
 print("</ul>")
 
-
 print("""
 </body>
 </html>
 """)
+
