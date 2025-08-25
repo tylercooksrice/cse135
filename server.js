@@ -1,6 +1,6 @@
 // app.js file
 
-var jsonServer = require('json-server');
+var jsonServer = require('/root/node_modules/json-server');
 
 // Returns an Express server
 var server = jsonServer.create();
