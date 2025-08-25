@@ -1,26 +1,13 @@
 #!/usr/bin/env python3
 import cgi
-import sys
 
-print("Content-Type: text/html")
-print()
+# Headers
+print("Content-Type: text/html\n")
 
-print("""
-<html><head><title>POST Message Body</title></head>
-<body><h1 align=center>POST Message Body</h1>
-<hr/>
-<b>Message Body:</b><br/>
-""")
-
+# Get POST data
 form = cgi.FieldStorage()
-
-if form.list:
-    print("<ul>")
-    for field in form.list:
-        print(f"<li>{cgi.escape(field.name)} = {cgi.escape(field.value)}</li>")
-    print("</ul>")
-else:
-    raw_data = sys.stdin.read()
-    print(f"<pre>{cgi.escape(raw_data)}</pre>")
-
-print("</body></html>")
+print("<h1>POST Data</h1>")
+print("<ul>")
+for key in form.keys():
+    print(f"<li>{key} = {form.getvalue(key)}</li>")
+print("</ul>")
