@@ -3,9 +3,12 @@ import os
 import cgi
 
 method = os.environ.get("REQUEST_METHOD", "GET")
+protocol = os.environ.get("SERVER_PROTOCOL", "")
+msgBody = os.environ.get("QUERY_STRING", "")
 print("Content-Type: text/html\n")
 
 print(f"<h1>Method: {method}</h1>")
+print(f"<p><b>HTTP Protocol:</b> {protocol} </p>")
 
 if method in ["POST", "PUT", "PATCH"]:
     form = cgi.FieldStorage()
@@ -16,3 +19,5 @@ if method in ["POST", "PUT", "PATCH"]:
 else:
     query_string = os.environ.get("QUERY_STRING", "")
     print(f"<h2>Query String: {query_string}</h2>")
+
+print(f"<p><b>Message Body:</b> {msgBody}</p>")
