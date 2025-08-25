@@ -2,7 +2,9 @@
 import cgi
 
 # Headers
-print("Content-Type: text/html\n\n")
+print("Cache-Control: no-cache")
+print("Content-Type: text/html")
+print("")
 
 # Get POST data
 form = cgi.FieldStorage()
