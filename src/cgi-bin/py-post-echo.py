@@ -12,9 +12,9 @@ print("""
 <head>
     <title>Python Post</title>
 </head>
-<body>
+<body>""")
 print("<h1>POST Data</h1>")
-print("<ul>")""")
+print("<ul>")
 for key in form.keys():
     print(f"<li>{key} = {form.getvalue(key)}</li>")
 
