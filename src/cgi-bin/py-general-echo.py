@@ -1,25 +1,18 @@
 #!/usr/bin/env python3
-import cgi
 import os
+import cgi
 
-print("Content-Type: text/html")
-print()
+method = os.environ.get("REQUEST_METHOD", "GET")
+print("Content-Type: text/html\n")
 
-print("""
-<!DOCTYPE html>
-<html><head><title>General Request Echo</title></head>
-<body><h1 align="center">General Request Echo</h1>
-<hr>
-""")
+print(f"<h1>Method: {method}</h1>")
 
-protocol = os.environ.get('SERVER_PROTOCOL', '')
-method = os.environ.get('REQUEST_METHOD', '')
-query = os.environ.get('QUERY_STRING', '')
-body = sys.stdin.read()
-
-print(f"<p><b>HTTP Protocol:</b> {cgi.escape(protocol)}</p>")
-print(f"<p><b>HTTP Method:</b> {cgi.escape(method)}</p>")
-print(f"<p><b>Query String:</b> {cgi.escape(query)}</p>")
-print(f"<p><b>Message Body:</b> {cgi.escape(body)}</p>")
-
-print("</body></html>")
+if method in ["POST", "PUT", "PATCH"]:
+    form = cgi.FieldStorage()
+    print("<h2>Payload</h2><ul>")
+    for key in form.keys():
+        print(f"<li>{key} = {form.getvalue(key)}</li>")
+    print("</ul>")
+else:
+    query_string = os.environ.get("QUERY_STRING", "")
+    print(f"<h2>Query String: {query_string}</h2>")

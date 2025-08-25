@@ -1,30 +1,58 @@
 #!/usr/bin/env python3
 import cgi
-import http.cookies
 import os
-import datetime
+import http.cookies
+import uuid
+import pickle
 
-print("Content-Type: text/html")
+# Session storage path
+SESSION_DIR = "/tmp/sessions"
 
-# Grab any existing cookies
-cookie = http.cookies.SimpleCookie(os.environ.get("HTTP_COOKIE"))
+def get_session_id():
+    cookie = http.cookies.SimpleCookie(os.environ.get('HTTP_COOKIE'))
+    return cookie.get('session_id').value if 'session_id' in cookie else None
+
+def save_session(session_id, data):
+    with open(f"{SESSION_DIR}/{session_id}", 'wb') as f:
+        pickle.dump(data, f)
+
+def load_session(session_id):
+    try:
+        with open(f"{SESSION_DIR}/{session_id}", 'rb') as f:
+            return pickle.load(f)
+    except FileNotFoundError:
+        return {}
+
+# Generate or retrieve session
+session_id = get_session_id()
+if not session_id:
+    session_id = str(uuid.uuid4())
+    # Set cookie in headers
+    print(f"Set-Cookie: session_id={session_id}; Path=/\n")
+
+session_data = load_session(session_id)
+
 form = cgi.FieldStorage()
+print("Content-Type: text/html\n")
 
-username = form.getvalue("username")
-
-if username:
-    # Save username in a cookie
-    cookie["username"] = username
-    cookie["username"]["path"] = "/"
-    cookie["username"]["expires"] = (datetime.datetime.utcnow() + datetime.timedelta(minutes=5)).strftime("%a, %d-%b-%Y %H:%M:%S GMT")
-    print(cookie.output())
-    print()
-    print(f"<html><body><h2>Hello, {username}! Your session has been saved.</h2>")
+# Page 1: Form input
+if not form.getvalue('name'):
+    print('''
+        <form method="POST">
+            Enter your name: <input type="text" name="name">
+            <input type="submit" value="Submit">
+        </form>
+    ''')
 else:
-    # Read cookie if no username in form
-    saved_user = cookie["username"].value if "username" in cookie else "Guest"
-    print()
-    print(f"<html><body><h2>Welcome back, {saved_user}!</h2>")
+    # Save name to session and show link to next page
+    session_data['name'] = form.getvalue('name')
+    save_session(session_id, session_data)
+    print('''
+        <h1>Name saved!</h1>
+        <a href="state-demo.py?page=2">Go to page 2</a>
+    ''')
 
-print('<a href="/session.html">Go back</a> | <a href="/index.html">Home</a>')
-print("</body></html>")
+# Page 2: Retrieve data from session
+if form.getvalue('page') == '2':
+    name = session_data.get('name', 'No name found')
+    print(f"<h1>Stored Name: {name}</h1>")
