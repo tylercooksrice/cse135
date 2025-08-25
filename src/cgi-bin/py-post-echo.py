@@ -6,7 +6,7 @@ print("Content-Type: text/html\n\n")
 
 # Get POST data
 form = cgi.FieldStorage()
-print("<DOCTYPE !html>")
+print("<!DOCTYPE html>")
 print("""
 <html>
 <head>
