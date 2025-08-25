@@ -7,13 +7,6 @@ print("Content-Type: text/html\n\n")
 # Get POST data
 form = cgi.FieldStorage()
 print("<DOCTYPE !html>")
-print("<html>")
-print("<body>")
-print("""
-<head>
-    <title>Python Post</title>
-</head>""")
-print("<!DOCTYPE html>")
 print("""
 <html>
 <head>
