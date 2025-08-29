@@ -1,23 +1,61 @@
 const http = require('http');
 
 const server = http.createServer((req, res) => {
-    res.writeHead(200, {'Content-Type': 'text/plain'});
+    res.writeHead(200, {'Content-Type': 'text/html'});
     
-    // Output request headers
-    res.write("=== HTTP Request Headers ===\n");
+    let responseHTML = `
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <title>Environment Variables</title>
+            <style>
+                body { font-family: Arial, sans-serif; margin: 40px; }
+                h1 { color: #333; }
+                table { border-collapse: collapse; width: 100%; }
+                th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+                th { background-color: #f2f2f2; }
+                tr:nth-child(even) { background-color: #f9f9f9; }
+            </style>
+        </head>
+        <body>
+            <h1>Environment Variables</h1>
+            <table>
+                <tr>
+                    <th>Variable</th>
+                    <th>Value</th>
+                </tr>
+    `;
+    
+    // Add request headers
     for (const [key, value] of Object.entries(req.headers)) {
-        res.write(`${key}: ${value}\n`);
+        responseHTML += `
+            <tr>
+                <td>${key}</td>
+                <td>${value}</td>
+            </tr>
+        `;
     }
     
-    // Output server variables (simulated)
-    res.write("\n=== Server Variables ===\n");
-    res.write(`HTTP Method: ${req.method}\n`);
-    res.write(`URL: ${req.url}\n`);
-    res.write(`HTTP Version: ${req.httpVersion}\n`);
+    // Add server environment variables
+    for (const [key, value] of Object.entries(process.env)) {
+        responseHTML += `
+            <tr>
+                <td>${key}</td>
+                <td>${value}</td>
+            </tr>
+        `;
+    }
     
-    res.end();
+    responseHTML += `
+            </table>
+            <p><a href="/">Back to Home</a></p>
+        </body>
+        </html>
+    `;
+    
+    res.end(responseHTML);
 });
 
-server.listen(3002, () => {
-    console.log('Environment server running on port 3002');
+server.listen(3003, () => {
+    console.log('Environment server running on port 3003');
 });

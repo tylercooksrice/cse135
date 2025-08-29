@@ -1,19 +1,19 @@
 const http = require('http');
 
 const server = http.createServer((req, res) => {
-    const ip = req.socket.remoteAddress;
-    const now = new Date();
+    const clientIP = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
+    const currentDate = new Date().toLocaleString();
     
-    const data = {
-        message: "Hello World",
-        timestamp: now.toString(),
-        ip: ip
+    const responseData = {
+        message: "Hello World!",
+        currentDateTime: currentDate,
+        clientIP: clientIP
     };
     
     res.writeHead(200, {'Content-Type': 'application/json'});
-    res.end(JSON.stringify(data, null, 2));
+    res.end(JSON.stringify(responseData));
 });
 
-server.listen(3001, () => {
-    console.log('Hello JSON World server running on port 3001');
+server.listen(3002, () => {
+    console.log('Hello JSON World server running on port 3002');
 });
