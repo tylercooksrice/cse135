@@ -20,6 +20,6 @@
   },
   "homepage": "https://github.com/tylercooksrice/cse135#readme",
   "dependencies": {
-    "json-server": "^0.17.0"
+    "json-server": "^0.16.3"
   }
 }
