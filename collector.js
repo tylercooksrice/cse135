@@ -233,29 +233,6 @@
             saveDataForRetry(dataToSend);
         });
     }
-    
-    
-        
-        // Fallback to fetch API
-        fetch(CONFIG.ENDPOINT, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(dataToSend)
-        })
-        .then(response => {
-            if (!response.ok) {
-                throw new Error('Server response not OK');
-            }
-        })
-        .catch(error => {
-            // Save data to localStorage for later retry
-            saveDataForRetry(dataToSend);
-        });
-        
-        return false;
-    }
 
     function saveDataForRetry(data) {
         // Get existing pending data
