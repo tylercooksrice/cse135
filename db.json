@@ -16,5 +16,54 @@
       { "id": 1 },
       { "id": 2 },
       { "id": 3 }
-    ]
+    ],
+  "sessionId": "unique_session_id",
+  "static": {
+    "userAgent": "Browser user agent",
+    "language": "User's language",
+    "cookieEnabled": true,
+    "javaScriptEnabled": true,
+    "imagesEnabled": true,
+    "cssEnabled": true,
+    "screenDimensions": {
+      "width": 1920,
+      "height": 1080,
+      "colorDepth": 24
+    },
+    "windowDimensions": {
+      "width": 1200,
+      "height": 800
+    },
+    "connectionType": "4g",
+    "onlineStatus": true
+  },
+  "performance": {
+    "timing": {  },
+    "pageStart": 123456789,
+    "pageEnd": 123456790,
+    "totalLoadTime": 1234,
+    "dnsTime": 12,
+    "tcpTime": 34,
+    "requestTime": 56,
+    "domLoadingTime": 789,
+    "domCompleteTime": 1234,
+    "collectedAt": 123456790
+  },
+  "activity": [
+    {
+      "type": "mousemove",
+      "x": 100,
+      "y": 200,
+      "timestamp": 123456791
+    },
+    {
+      "type": "click",
+      "button": 0,
+      "x": 150,
+      "y": 250,
+      "target": "BUTTON",
+      "timestamp": 123456792
+    }
+  ],
+  "sentAt": 123456800
 }
