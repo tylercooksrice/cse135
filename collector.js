@@ -210,11 +210,8 @@
 
     // Data sending functions
     function sendData() {
-        if (analyticsData.activity.length === 0) {
-            return; // No data to send
-        }
-        
-        // Prepare data to send (copy and clear activity buffer)
+        if (analyticsData.activity.length === 0) return;
+    
         const dataToSend = {
             sessionId: analyticsData.sessionId,
             static: analyticsData.static,
@@ -222,14 +219,22 @@
             activity: analyticsData.activity.splice(0, CONFIG.MAX_ITEMS_PER_BATCH),
             sentAt: Date.now()
         };
-        
-        // Try to send using sendBeacon first (better for page unload)
-        if (navigator.sendBeacon) {
-            const blob = new Blob([JSON.stringify(dataToSend)], { type: 'application/json' });
-            if (navigator.sendBeacon(CONFIG.ENDPOINT, blob)) {
-                return true;
-            }
-        }
+    
+        fetch(CONFIG.ENDPOINT, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(dataToSend)
+        })
+        .then(response => {
+            if (!response.ok) throw new Error('Server response not OK');
+        })
+        .catch(err => {
+            console.error('Analytics send failed', err);
+            saveDataForRetry(dataToSend);
+        });
+    }
+    
+    
         
         // Fallback to fetch API
         fetch(CONFIG.ENDPOINT, {
