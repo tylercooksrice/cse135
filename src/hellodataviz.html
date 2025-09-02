@@ -1,2 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Hello DataViz</title>
+  <script src="https://cdn.zinggrid.com/zingchart.min.js"></script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f4f4f9;
+      margin: 20px;
+    }
+    h2 {
+      margin-top: 40px;
+    }
+    .chart-container {
+      margin: 20px auto;
+      width: 80%;
+      height: 400px;
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+      padding: 10px;
+    }
+  </style>
+</head>
+<body>
+  <h1>Hello DataViz</h1>
 
-<script src="https://cdn.zingchart.com/zingchart.min.js"></script>
+  <h2>3-Series Line Chart</h2>
+  <div id="lineChart" class="chart-container"></div>
+
+  <h2>2-Series Bar Chart</h2>
+  <div id="barChart" class="chart-container"></div>
+
+  <h2>Pie Chart</h2>
+  <div id="pieChart" class="chart-container"></div>
+
+  <script>
+    // --- 3-Series Line Chart ---
+    let lineChartData = {
+      type: 'line',
+      title: { text: "Website Load Times (ms)" },
+      legend: { draggable: true },
+      scaleX: {
+        labels: ["Mon", "Tue", "Wed", "Thu", "Fri"]
+      },
+      series: [
+        { text: "Home Page", values: [120, 130, 125, 140, 110] },
+        { text: "Portfolio", values: [200, 210, 190, 220, 180] },
+        { text: "Contact", values: [90, 100, 95, 105, 85] }
+      ]
+    };
+    zingchart.render({ id: 'lineChart', data: lineChartData, height: '100%', width: '100%' });
+
+    // --- 2-Series Bar Chart ---
+    let barChartData = {
+      type: 'bar',
+      title: { text: "User Actions by Page" },
+      scaleX: { labels: ["Home", "Portfolio", "Contact", "Blog"] },
+      series: [
+        { text: "Clicks", values: [50, 75, 30, 60] },
+        { text: "Scrolls", values: [80, 100, 45, 90] }
+      ]
+    };
+    zingchart.render({ id: 'barChart', data: barChartData, height: '100%', width: '100%' });
+
+    // --- Pie Chart ---
+    let pieChartData = {
+      type: 'pie',
+      title: { text: "Device Breakdown" },
+      series: [
+        { text: "Desktop", values: [55] },
+        { text: "Mobile", values: [35] },
+        { text: "Tablet", values: [10] }
+      ]
+    };
+    zingchart.render({ id: 'pieChart', data: pieChartData, height: '100%', width: '100%' });
+  </script>
+</body>
+</html>
