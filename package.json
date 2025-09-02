@@ -20,6 +20,7 @@
   },
   "homepage": "https://github.com/tylercooksrice/cse135#readme",
   "dependencies": {
-    "json-server": "^0.16.3"
+    "json-server": "^0.16.3",
+    "mysql2": "^3.14.4"
   }
 }
