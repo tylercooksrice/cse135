@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Analytics Database Viewer</title>
+  <script src="https://cdn.zinggrid.com/zinggrid.min.js"></script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 20px;
+    }
+    h2 {
+      margin-top: 40px;
+    }
+  </style>
+</head>
+<body>
+  <h1>Analytics Data Viewer</h1>
+
+  <!-- Static Data -->
+  <h2>Static Data</h2>
+  <zing-grid 
+    src="/api/static" 
+    caption="Static Data" 
+    layout="row"
+    pager page-size="10"
+    theme="modern"
+    sort
+    filter
+    >
+  </zing-grid>
+
+  <!-- Performance Data -->
+  <h2>Performance Data</h2>
+  <zing-grid 
+    src="/api/performance" 
+    caption="Performance Data" 
+    layout="row"
+    pager page-size="10"
+    theme="modern"
+    sort
+    filter
+    >
+  </zing-grid>
+
+  <!-- Activity Data -->
+  <h2>Activity Data</h2>
+  <zing-grid 
+    src="/api/activity" 
+    caption="Activity Data" 
+    layout="row"
+    pager page-size="10"
+    theme="modern"
+    sort
+    filter
+    >
+  </zing-grid>
+
+</body>
+</html>
