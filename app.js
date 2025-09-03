@@ -24,18 +24,37 @@ const pool = mysql.createPool({
   connectionLimit: 10,
 });
 
-// Parse JSON payload columns returned as strings
 const parsePayload = (rows) =>
   rows.map((r) => {
     const payload = r.payload && typeof r.payload === 'string'
       ? JSON.parse(r.payload)
       : r.payload || {};
+
+    const innerWidth   = payload.windowDimensions?.width;
+    const innerHeight  = payload.windowDimensions?.height;
+    const screenWidth  = payload.screenDimensions?.width;
+    const screenHeight = payload.screenDimensions?.height;
+
+    const pageStart = payload.pageStart ?? payload.timing?.navigationStart ?? null;
+    const pageEnd   = payload.pageEnd   ?? payload.timing?.loadEventEnd   ?? null;
+    const totalLoad = payload.totalLoadTime
+      ?? (pageStart != null && pageEnd != null ? (pageEnd - pageStart) : undefined)
+      ?? payload.navigation?.loadTime;
+
     return {
       id: r.id,
       sessionId: r.session_id,
       createdAt: r.created_at,
-      page: r.page_path || payload?.page?.path,
+      page: r.page_path || payload?.page?.path || payload?.page?.url || null,
       ...payload,
+
+      innerWidth,
+      innerHeight,
+      screenWidth,
+      screenHeight,
+      navigationStart: pageStart,
+      loadEventEnd: pageEnd,
+      totalLoadTime: totalLoad,
     };
   });
 
