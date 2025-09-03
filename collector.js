@@ -6,7 +6,7 @@
 
     // Config
     const CONFIG = {
-        ENDPOINT: '/api/json/analytics',
+        ENDPOINT: '/json/analytics',
         SEND_INTERVAL: 10000,       // Send data every 10 seconds
         IDLE_THRESHOLD: 2000,       // Consider 2 seconds as idle
         MAX_ITEMS_PER_BATCH: 50     // Cap each batch at 50 items
