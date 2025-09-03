@@ -21,17 +21,17 @@
 <body>
     <h1>Hello DataViz</h1>
 
-    <h2>3-Series Line Chart</h2>
+    <h2>Page Load Times (Line Chart)</h2>
     <div id="lineChart" class="chart-container"></div>
 
-    <h2>2-Series Bar Chart</h2>
+    <h2>User Events (Bar Chart)</h2>
     <div id="barChart" class="chart-container"></div>
 
-    <h2>Pie Chart</h2>
+    <h2>User Languages (Pie Chart)</h2>
     <div id="pieChart" class="chart-container"></div>
 
     <script>
-        // --- Helper to generate random colors for pie slices ---
+        // Helper to generate random colors for pie slices
         function getRandomColor() {
             const letters = '0123456789ABCDEF';
             let color = '#';
@@ -44,18 +44,27 @@
             const res = await fetch('/api/performance');
             const perfData = await res.json();
 
-            const pages = [...new Set(perfData.map(d => d.page))];
+            // Convert timestamps to Date objects
+            perfData.forEach(d => {
+                d.collectedAtDate = d.collectedAt ? new Date(d.collectedAt) : new Date();
+            });
+
+            const pages = [...new Set(perfData.map(d => d.pagePath || d.page))];
             const series = pages.map(page => ({
                 text: page,
-                values: perfData.filter(d => d.page === page).map(d => d.loadTime || d.navigation?.loadTime || 0)
+                values: perfData
+                    .filter(d => (d.pagePath || d.page) === page)
+                    .map(d => d.loadTime || (d.navigation && d.navigation.loadTime) || 0)
             }));
+
+            const labels = perfData.map(d => d.collectedAtDate.toLocaleTimeString());
 
             zingchart.render({
                 id: 'lineChart',
                 data: {
                     type: 'line',
                     title: { text: "Page Load Times" },
-                    scaleX: { labels: perfData.map(d => new Date(d.ts).toLocaleTimeString()) },
+                    scaleX: { labels },
                     series
                 },
                 height: '100%',
@@ -63,19 +72,21 @@
             });
         }
 
-        // --- Bar Chart: Clicks and Scrolls ---
+        // --- Bar Chart: Clicks, Scrolls, Mouse Moves ---
         async function loadActivityData() {
             const res = await fetch('/api/activity');
             const actData = await res.json();
 
             const eventCounts = actData.reduce((acc, d) => {
-                acc[d.type || d.event] = (acc[d.type || d.event] || 0) + 1;
+                const type = d.type || d.event;
+                acc[type] = (acc[type] || 0) + 1;
                 return acc;
             }, {});
 
             const labels = Object.keys(eventCounts);
             const clicks = labels.map(l => l === 'click' ? eventCounts[l] : 0);
             const scrolls = labels.map(l => l === 'scroll' ? eventCounts[l] : 0);
+            const mousemoves = labels.map(l => l === 'mousemove' ? eventCounts[l] : 0);
 
             zingchart.render({
                 id: 'barChart',
@@ -85,7 +96,8 @@
                     scaleX: { labels },
                     series: [
                         { text: "Clicks", values: clicks },
-                        { text: "Scrolls", values: scrolls }
+                        { text: "Scrolls", values: scrolls },
+                        { text: "Mouse Moves", values: mousemoves }
                     ]
                 },
                 height: '100%',
@@ -93,13 +105,14 @@
             });
         }
 
-        // --- Pie Chart: User Languages with Labels ---
+        // --- Pie Chart: User Languages ---
         async function loadStaticData() {
             const res = await fetch('/api/static');
             const staticData = await res.json();
 
             const counts = staticData.reduce((acc, d) => {
-                acc[d.language] = (acc[d.language] || 0) + 1;
+                const lang = d.language || "unknown";
+                acc[lang] = (acc[lang] || 0) + 1;
                 return acc;
             }, {});
 
@@ -116,8 +129,8 @@
                     plot: {
                         valueBox: {
                             visible: true,
-                            type: 'all',      // Show both label and value
-                            text: '%t: %v',   // %t = label, %v = value
+                            type: 'all',
+                            text: '%t: %v',
                             fontSize: 14,
                             placement: 'out'
                         }
