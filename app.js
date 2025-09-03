@@ -1,117 +1,183 @@
-// app.js - REST API + analytics collector
+// app.js
 const express = require("express");
 const bodyParser = require("body-parser");
-const mysql = require("mysql2/promise");
 const path = require("path");
+const mysql = require("mysql2/promise");
 
 const app = express();
-const PORT = 4000; // pm2 handles proxy, Apache forwards /api -> 4000
-
 app.use(bodyParser.json());
 app.use(express.static(path.join(__dirname, "public")));
 
-// ===== MySQL Connection Pool =====
+// MySQL connection pool
 const db = mysql.createPool({
   host: "localhost",
-  user: "analytics_user",   // change if needed
-  password: "CSE135powell$", // change if needed
-  database: "analytics", // your DB name
-  waitForConnections: true,
-  connectionLimit: 10,
-  queueLimit: 0,
+  user: "analytics_user",
+  password: "CSE135powell$",
+  database: "analytics"
 });
 
-// ======== DEMO DATA (for REST.png screenshot) ========
-const demoStatic = [
-  { id: 1, userAgent: "Mozilla/5.0", language: "en-US" },
-  { id: 2, userAgent: "Chrome/139.0", language: "en-US" },
-];
+// ---------------- REST ENDPOINTS ---------------- //
 
-// ======== REST ROUTES EXAMPLE ========
-
-// GET all rows from a table
-app.get("/api/:table", async (req, res) => {
-  const { table } = req.params;
-
+// STATIC DATA
+app.get("/api/static", async (req, res) => {
   try {
-    if (table === "static" && process.env.DEMO === "true") {
-      return res.json(demoStatic);
-    }
-
-    const [rows] = await db.query(`SELECT * FROM ??`, [table]);
+    const [rows] = await db.query("SELECT * FROM static_data");
     res.json(rows);
   } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: "DB query failed" });
+    res.status(500).json({ error: err.message });
   }
 });
 
-// GET single row by id
-app.get("/api/:table/:id", async (req, res) => {
-  const { table, id } = req.params;
-
+app.get("/api/static/:id", async (req, res) => {
   try {
-    const [rows] = await db.query(`SELECT * FROM ?? WHERE id = ?`, [table, id]);
-    if (rows.length === 0) return res.status(404).json({ error: "Not found" });
-    res.json(rows[0]);
+    const [rows] = await db.query("SELECT * FROM static_data WHERE id = ?", [req.params.id]);
+    rows.length ? res.json(rows[0]) : res.status(404).send("Not Found");
   } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: "DB query failed" });
+    res.status(500).json({ error: err.message });
   }
 });
 
-// POST new row
-app.post("/api/:table", async (req, res) => {
-  const { table } = req.params;
-  const data = req.body;
-
+// PERFORMANCE DATA
+app.get("/api/performance", async (req, res) => {
   try {
-    const [result] = await db.query(`INSERT INTO ?? SET ?`, [table, data]);
-    res.status(201).json({ id: result.insertId, ...data });
+    const [rows] = await db.query("SELECT * FROM performance_data");
+    res.json(rows);
   } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: "DB insert failed" });
+    res.status(500).json({ error: err.message });
   }
 });
 
-// PUT update row
-app.put("/api/:table/:id", async (req, res) => {
-  const { table, id } = req.params;
-  const data = req.body;
-
+app.get("/api/performance/:id", async (req, res) => {
   try {
-    await db.query(`UPDATE ?? SET ? WHERE id = ?`, [table, data, id]);
-    res.json({ id, ...data });
+    const [rows] = await db.query("SELECT * FROM performance_data WHERE id = ?", [req.params.id]);
+    rows.length ? res.json(rows[0]) : res.status(404).send("Not Found");
   } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: "DB update failed" });
+    res.status(500).json({ error: err.message });
   }
 });
 
-// DELETE row
-app.delete("/api/:table/:id", async (req, res) => {
-  const { table, id } = req.params;
-
+// ACTIVITY DATA
+app.get("/api/activity", async (req, res) => {
   try {
-    await db.query(`DELETE FROM ?? WHERE id = ?`, [table, id]);
-    res.json({ success: true });
+    const [rows] = await db.query("SELECT * FROM activity_data");
+    res.json(rows);
   } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: "DB delete failed" });
+    res.status(500).json({ error: err.message });
   }
 });
 
-// ======== ANALYTICS ENDPOINT (from collector.js) ========
-app.post("/json/analytics", (req, res) => {
-  console.log("Analytics batch received:", req.body);
-
-  // TODO: insert into DB (static, performance, activity tables)
-  // e.g. db.query("INSERT INTO static SET ?", req.body.static)
-
-  res.status(200).json({ message: "Analytics received" });
+app.get("/api/activity/:id", async (req, res) => {
+  try {
+    const [rows] = await db.query("SELECT * FROM activity_data WHERE id = ?", [req.params.id]);
+    rows.length ? res.json(rows[0]) : res.status(404).send("Not Found");
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
 });
 
-// ======== START SERVER ========
-app.listen(PORT, () => {
-  console.log(`REST API server running on port ${PORT}`);
+// ---------------- COLLECTOR ROUTE ---------------- //
+app.post("/json/analytics", async (req, res) => {
+  try {
+    const { sessionId, static: staticBlock, performance: perfBlock, activity: activities } = req.body || {};
+
+    console.log("Incoming analytics data:", req.body);
+
+    // Insert static data
+    if (staticBlock && Object.keys(staticBlock).length) {
+      try {
+        await db.query(
+          `INSERT INTO static_data 
+            (session_id, userAgent, language, cookieEnabled, javaScriptEnabled, imagesEnabled, cssEnabled, 
+             screenWidth, screenHeight, colorDepth, windowWidth, windowHeight, connectionType, onlineStatus, pageUrl, pagePath, referrer)
+           VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+          [
+            sessionId,
+            staticBlock.userAgent || null,
+            staticBlock.language || null,
+            !!staticBlock.cookieEnabled,
+            !!staticBlock.javaScriptEnabled,
+            !!staticBlock.imagesEnabled,
+            !!staticBlock.cssEnabled,
+            staticBlock.screenDimensions?.width || null,
+            staticBlock.screenDimensions?.height || null,
+            staticBlock.screenDimensions?.colorDepth || null,
+            staticBlock.windowDimensions?.width || null,
+            staticBlock.windowDimensions?.height || null,
+            staticBlock.connectionType || null,
+            !!staticBlock.onlineStatus,
+            staticBlock.page?.url || null,
+            staticBlock.page?.path || null,
+            staticBlock.page?.referrer || null
+          ]
+        );
+        console.log("Inserted static data for session:", sessionId);
+      } catch (err) {
+        console.error("Static data insert failed:", err);
+      }
+    }
+
+    // Insert performance data
+    if (perfBlock && Object.keys(perfBlock).length) {
+      try {
+        await db.query(
+          `INSERT INTO performance_data 
+            (session_id, pagePath, loadTime, domInteractive, domContentLoaded, collectedAt)
+           VALUES (?, ?, ?, ?, ?, ?)`,
+          [
+            sessionId,
+            perfBlock.page?.path || "unknown",
+            perfBlock.navigation?.loadTime || null,
+            perfBlock.navigation?.domInteractive || null,
+            perfBlock.navigation?.domContentLoaded || null,
+            perfBlock.collectedAt || Date.now()
+          ]
+        );
+        console.log("Inserted performance data for session:", sessionId);
+      } catch (err) {
+        console.error("Performance data insert failed:", err);
+      }
+    }
+
+    // Insert activity data
+    if (Array.isArray(activities) && activities.length) {
+      for (const a of activities) {
+        try {
+          await db.query(
+            `INSERT INTO activity_data (session_id, event, details, ts)
+             VALUES (?, ?, ?, ?)`,
+            [
+              sessionId,
+              a.type || "unknown",
+              JSON.stringify(a),
+              a.timestamp || Date.now()
+            ]
+          );
+        } catch (err) {
+          console.error("Activity insert failed:", err, a);
+        }
+      }
+      console.log(`Inserted ${activities.length} activity events for session:`, sessionId);
+    }
+
+    res.status(202).json({ ok: true });
+  } catch (err) {
+    console.error("Error saving analytics:", err);
+    res.status(500).json({ ok: false, error: err.message });
+  }
 });
+
+// ---------------- DEBUG ---------------- //
+app.get("/api/debug/all", async (req, res) => {
+  try {
+    const [staticData] = await db.query("SELECT * FROM static_data");
+    const [performanceData] = await db.query("SELECT * FROM performance_data");
+    const [activityData] = await db.query("SELECT * FROM activity_data");
+    res.json({ staticData, performanceData, activityData });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// ---------------- START SERVER ---------------- //
+const PORT = 4000;
+app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
