@@ -4,117 +4,134 @@
     <meta charset="UTF-8">
     <title>Hello DataViz</title>
     <script src="https://cdn.zingchart.com/zingchart.min.js"></script>
-  <style>
-    body { font-family: Arial, sans-serif; margin: 20px; background: #f4f4f9; }
-    h2 { margin-top: 40px; }
-    .chart-container {
-      margin: 20px auto;
-      width: 80%;
-      height: 400px;
-      background: white;
-      border-radius: 12px;
-      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-      padding: 10px;
-    }
-  </style>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; background: #f4f4f9; }
+        h2 { margin-top: 40px; }
+        .chart-container {
+            margin: 20px auto;
+            width: 80%;
+            height: 400px;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            padding: 10px;
+        }
+    </style>
 </head>
 <body>
-  <h1>Hello DataViz</h1>
+    <h1>Hello DataViz</h1>
 
-  <h2>3-Series Line Chart</h2>
-  <div id="lineChart" class="chart-container"></div>
+    <h2>3-Series Line Chart</h2>
+    <div id="lineChart" class="chart-container"></div>
 
-  <h2>2-Series Bar Chart</h2>
-  <div id="barChart" class="chart-container"></div>
+    <h2>2-Series Bar Chart</h2>
+    <div id="barChart" class="chart-container"></div>
 
-  <h2>Pie Chart</h2>
-  <div id="pieChart" class="chart-container"></div>
+    <h2>Pie Chart</h2>
+    <div id="pieChart" class="chart-container"></div>
 
-  <script>
-    // ---- Fetch & build charts ----
+    <script>
+        // --- Helper to generate random colors for pie slices ---
+        function getRandomColor() {
+            const letters = '0123456789ABCDEF';
+            let color = '#';
+            for (let i = 0; i < 6; i++) color += letters[Math.floor(Math.random() * 16)];
+            return color;
+        }
 
-    async function loadPerformanceData() {
-      const res = await fetch('/api/performance');
-      const perfData = await res.json();
+        // --- Line Chart: Page Load Times ---
+        async function loadPerformanceData() {
+            const res = await fetch('/api/performance');
+            const perfData = await res.json();
 
-      // Example: group loadTime by page
-      const pages = [...new Set(perfData.map(d => d.page))];
-      const series = pages.map(page => ({
-        text: page,
-        values: perfData.filter(d => d.page === page).map(d => d.loadTime || d.navigation?.loadTime || 0)
-      }));
+            const pages = [...new Set(perfData.map(d => d.page))];
+            const series = pages.map(page => ({
+                text: page,
+                values: perfData.filter(d => d.page === page).map(d => d.loadTime || d.navigation?.loadTime || 0)
+            }));
 
-      zingchart.render({
-        id: 'lineChart',
-        data: {
-          type: 'line',
-          title: { text: "Page Load Times" },
-          scaleX: { labels: perfData.map(d => new Date(d.ts).toLocaleTimeString()) },
-          series
-        },
-        height: '100%',
-        width: '100%'
-      });
-    }
+            zingchart.render({
+                id: 'lineChart',
+                data: {
+                    type: 'line',
+                    title: { text: "Page Load Times" },
+                    scaleX: { labels: perfData.map(d => new Date(d.ts).toLocaleTimeString()) },
+                    series
+                },
+                height: '100%',
+                width: '100%'
+            });
+        }
 
-    async function loadActivityData() {
-      const res = await fetch('/api/activity');
-      const actData = await res.json();
+        // --- Bar Chart: Clicks and Scrolls ---
+        async function loadActivityData() {
+            const res = await fetch('/api/activity');
+            const actData = await res.json();
 
-      // Count events by type
-      const eventCounts = actData.reduce((acc, d) => {
-        acc[d.type || d.event] = (acc[d.type || d.event] || 0) + 1;
-        return acc;
-      }, {});
+            const eventCounts = actData.reduce((acc, d) => {
+                acc[d.type || d.event] = (acc[d.type || d.event] || 0) + 1;
+                return acc;
+            }, {});
 
-      const labels = Object.keys(eventCounts);
-      const clicks = labels.map(l => l === 'click' ? eventCounts[l] : 0);
-      const scrolls = labels.map(l => l === 'scroll' ? eventCounts[l] : 0);
+            const labels = Object.keys(eventCounts);
+            const clicks = labels.map(l => l === 'click' ? eventCounts[l] : 0);
+            const scrolls = labels.map(l => l === 'scroll' ? eventCounts[l] : 0);
 
-      zingchart.render({
-        id: 'barChart',
-        data: {
-          type: 'bar',
-          title: { text: "User Events by Type" },
-          scaleX: { labels },
-          series: [
-            { text: "Clicks", values: clicks },
-            { text: "Scrolls", values: scrolls }
-          ]
-        },
-        height: '100%',
-        width: '100%'
-      });
-    }
+            zingchart.render({
+                id: 'barChart',
+                data: {
+                    type: 'bar',
+                    title: { text: "User Events by Type" },
+                    scaleX: { labels },
+                    series: [
+                        { text: "Clicks", values: clicks },
+                        { text: "Scrolls", values: scrolls }
+                    ]
+                },
+                height: '100%',
+                width: '100%'
+            });
+        }
 
-    async function loadStaticData() {
-      const res = await fetch('/api/static');
-      const staticData = await res.json();
+        // --- Pie Chart: User Languages with Labels ---
+        async function loadStaticData() {
+            const res = await fetch('/api/static');
+            const staticData = await res.json();
 
-      // Count devices by language
-      const counts = staticData.reduce((acc, d) => {
-        acc[d.language] = (acc[d.language] || 0) + 1;
-        return acc;
-      }, {});
+            const counts = staticData.reduce((acc, d) => {
+                acc[d.language] = (acc[d.language] || 0) + 1;
+                return acc;
+            }, {});
 
-      zingchart.render({
-        id: 'pieChart',
-        data: {
-          type: 'pie',
-          title: { text: "User Languages" },
-          series: Object.entries(counts).map(([lang, count]) => ({
-            text: lang, values: [count]
-          }))
-        },
-        height: '100%',
-        width: '100%'
-      });
-    }
+            zingchart.render({
+                id: 'pieChart',
+                data: {
+                    type: 'pie',
+                    title: { text: "User Languages" },
+                    series: Object.entries(counts).map(([lang, count]) => ({
+                        text: lang,
+                        values: [count],
+                        backgroundColor: getRandomColor()
+                    })),
+                    plot: {
+                        valueBox: {
+                            visible: true,
+                            type: 'all',      // Show both label and value
+                            text: '%t: %v',   // %t = label, %v = value
+                            fontSize: 14,
+                            placement: 'out'
+                        }
+                    }
+                },
+                height: '100%',
+                width: '100%'
+            });
+        }
 
-    // Run all
-    loadPerformanceData();
-    loadActivityData();
-    loadStaticData();
-  </script>
+        // --- Run all charts ---
+        loadPerformanceData();
+        loadActivityData();
+        loadStaticData();
+    </script>
 </body>
 </html>
