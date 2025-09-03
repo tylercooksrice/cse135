@@ -15,7 +15,7 @@ const db = mysql.createPool({
   host: "localhost",
   user: "analytics_user",   // change if needed
   password: "CSE135powell$", // change if needed
-  database: "analytics_db", // your DB name
+  database: "analytics", // your DB name
   waitForConnections: true,
   connectionLimit: 10,
   queueLimit: 0,
