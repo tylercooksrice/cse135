@@ -26,7 +26,19 @@ const pool = mysql.createPool({
 
 // Parse JSON payload columns returned as strings
 const parsePayload = (rows) =>
-  rows.map((r) => (r.payload ? { ...r, payload: JSON.parse(r.payload) } : r));
+  rows.map((r) => {
+    const payload = r.payload && typeof r.payload === 'string'
+      ? JSON.parse(r.payload)
+      : r.payload || {};
+    return {
+      id: r.id,
+      sessionId: r.session_id,
+      createdAt: r.created_at,
+      page: r.page_path || payload?.page?.path,
+      ...payload,
+    };
+  });
+
 
 /*
   Batch collector endpoint.
