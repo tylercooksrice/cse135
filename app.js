@@ -53,8 +53,12 @@ app.get("/api/activity/:id", async (req, res) => {
 
 // ---------------- COLLECTOR ROUTE ---------------- //
 app.post("/json/analytics", async (req, res) => {
+  console.log("Received analytics POST:", req.body);
   try {
     const { sessionId, static: staticBlock, performance: perfBlock, activity: activities } = req.body || {};
+    console.log("Static:", staticBlock);
+    console.log("Performance:", perfBlock);
+    console.log("Activity:", activities);
 
     // Insert static data
     if (staticBlock && Object.keys(staticBlock).length) {
