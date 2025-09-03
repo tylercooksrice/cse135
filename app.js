@@ -91,7 +91,7 @@ app.get("/api/debug/all", async (req, res) => {
 app.post("/json/analytics", async (req, res) => {
   try {
     const { sessionId, static: staticBlock, performance: perfBlock, activity: activities } = req.body;
-
+    console.log("works");
     // Insert static data
     if (staticBlock) {
       await db.query(
