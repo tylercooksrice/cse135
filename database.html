@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>database.html – simple</title>
+  <script defer src="https://cdn.zinggrid.com/zinggrid.min.js"></script>
+  <style>
+    html, body { margin:0; font:14px Roboto; background:#0b1220; color:#e5e7eb; }
+    header { padding:12px 14px; border-bottom:1px solid #1f2937; }
+    h1 { margin:0; font-size:18px; }
+    .wrap { max-width:1100px; margin:0 auto; padding:12px 14px 24px; }
+    .controls { display:flex; gap:8px; flex-wrap:wrap; margin:8px 0 12px; }
+    .controls input, .controls select { padding:6px 8px; background:#0f172a; color:#e5e7eb; border:1px solid #1f2937; border-radius:6px; }
+    section { margin:10px 0 18px; }
+    h2 { margin:0 0 6px; font-size:15px; font-weight:600; }
+    zing-grid { --theme: midnight; border-radius:8px; overflow:hidden; }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Database Viewer</h1>
+  </header>
+  <div class="wrap">
+    <p style="margin:0 0 8px; color:#a7b0bd">Data is fetched from REST endpoints: <code>/api/static</code>, <code>/api/performance</code>, and <code>/api/activity</code>. No hardcoded rows.</p>
+
+    <div class="controls">
+      <input id="sessionFilter" placeholder="Filter by sessionId…" />
+      <span id="status" style="color:#a7b0bd"></span>
+    </div>
+
+    <!-- Static -->
+    <section>
+      <h2>Static</h2>
+      <zing-grid id="gridStatic" src="/api/static" search sort pager page-size="20" viewport-stop editor-controls="disabled">
+        <zg-colgroup>
+          <zg-column index="id" type="number" header="ID" width="70"></zg-column>
+          <zg-column index="sessionId" header="Session"></zg-column>
+          <zg-column index="language" header="Lang" width="100"></zg-column>
+          <zg-column index="cookieEnabled" header="Cookies"></zg-column>
+          <zg-column index="innerWidth" header="Inner W"></zg-column>
+          <zg-column index="innerHeight" header="Inner H"></zg-column>
+          <zg-column index="outerWidth" header="Outer W"></zg-column>
+          <zg-column index="outerHeight" header="Outer H"></zg-column>
+          <zg-column index="userAgent" header="User Agent" width="320"></zg-column>
+        </zg-colgroup>
+      </zing-grid>
+    </section>
+
+    <!-- Performance -->
+    <section>
+      <h2>Performance</h2>
+      <zing-grid id="gridPerf" src="/api/performance" search sort pager page-size="20" viewport-stop editor-controls="disabled">
+        <zg-colgroup>
+          <zg-column index="id" type="number" header="ID" width="70"></zg-column>
+          <zg-column index="sessionId" header="Session"></zg-column>
+          <zg-column index="page" header="Page"></zg-column>
+          <zg-column index="navigationStart" header="Nav Start"></zg-column>
+          <zg-column index="loadEventEnd" header="Load End"></zg-column>
+          <zg-column index="totalLoadTime" header="Total (ms)"></zg-column>
+        </zg-colgroup>
+      </zing-grid>
+    </section>
+
+    <!-- Activity -->
+    <section>
+      <h2>Activity</h2>
+      <zing-grid id="gridActivity" src="/api/activity" search sort pager page-size="20" viewport-stop editor-controls="disabled">
+        <zg-colgroup>
+          <zg-column index="id" type="number" header="ID" width="70"></zg-column>
+          <zg-column index="sessionId" header="Session"></zg-column>
+          <zg-column index="event" header="Event"></zg-column>
+          <zg-column index="ts" header="Timestamp"></zg-column>
+          <zg-column index="x" header="X"></zg-column>
+          <zg-column index="y" header="Y"></zg-column>
+          <zg-column index="key" header="Key"></zg-column>
+          <zg-column index="scrollY" header="ScrollY"></zg-column>
+          <zg-column index="idleMs" header="Idle (ms)"></zg-column>
+          <zg-column index="error" header="Error"></zg-column>
+        </zg-colgroup>
+      </zing-grid>
+    </section>
+  </div>
+
+  <script>
+    const $ = (id) => document.getElementById(id);
+
+    // Minimal global filter: sessionId applied to all grids
+    function applyFilters(){
+      const q = $('sessionFilter').value.trim();
+      const rule = q ? `sessionId*=${q}` : '';
+      ['gridStatic','gridPerf','gridActivity'].forEach(id => {
+        const g = $(id);
+        g.setAttribute('filter', rule);
+      });
+    }
+    $('sessionFilter').addEventListener('input', applyFilters);
+
+    (async () => {
+      try {
+        const res = await fetch('/api/static', { headers:{ 'Accept':'application/json' } });
+        $('status').textContent = res.ok ? 'Endpoints reachable.' : 'API error.';
+      } catch(e) {
+        $('status').textContent = 'API unreachable.';
+      }
+    })();
+  </script>
+</body>
+</html>
