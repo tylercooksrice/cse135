@@ -89,7 +89,7 @@ app.get("/api/debug/all", async (req, res) => {
 });
 
 // ---------------- COLLECTOR ROUTE ---------------- //
-app.post("/json/analytics", async (req, res) => {
+app.post("https://akhils.site/json/analytics", async (req, res) => {
   try {
     const { sessionId, static: staticBlock, performance: perfBlock, activity: activities } = req.body;
     console.log("works");
