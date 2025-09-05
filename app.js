@@ -98,97 +98,101 @@ app.get("/api/debug/all", async (req, res) => {
   }
 });
 
-// Handle analytics data
+// ---------------- Handle analytics data ---------------- //
 app.post("/json/analytics", async (req, res) => {
-  const { session_id, staticBlock, perfBlock, activities } = req.body;
+  const { sessionId, static, performance, activity } = req.body;
 
-  console.log(" Incoming /json/analytics payload:");
+  console.log("📥 Incoming /json/analytics payload:");
   console.log(JSON.stringify(req.body, null, 2));
 
   try {
-    // Insert static data
-    if (staticBlock) {
-      try {
-        const [result] = await db.query(
-          `INSERT INTO static_data 
-          (session_id, userAgent, language, cookieEnabled, javaScriptEnabled, imagesEnabled, cssEnabled, screenWidth, screenHeight, colorDepth, windowWidth, windowHeight, connectionType, onlineStatus, pageUrl, pagePath, referrer) 
-          VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-          [
-            session_id,
-            staticBlock.userAgent,
-            staticBlock.language,
-            staticBlock.cookieEnabled,
-            staticBlock.javaScriptEnabled,
-            staticBlock.imagesEnabled,
-            staticBlock.cssEnabled,
-            staticBlock.screenWidth,
-            staticBlock.screenHeight,
-            staticBlock.colorDepth,
-            staticBlock.windowWidth,
-            staticBlock.windowHeight,
-            staticBlock.connectionType,
-            staticBlock.onlineStatus,
-            staticBlock.pageUrl,
-            staticBlock.pagePath,
-            staticBlock.referrer,
-          ]
-        );
-        console.log("✅ Static data inserted:", result);
-      } catch (err) {
-        console.error("❌ Failed inserting static data:", err.message);
+      // ---------------- Static Data ---------------- //
+      if (static) {
+          try {
+              const [result] = await db.query(
+                  `INSERT INTO static_data 
+                  (session_id, userAgent, language, cookieEnabled, javaScriptEnabled, imagesEnabled, cssEnabled,
+                   screenWidth, screenHeight, colorDepth, windowWidth, windowHeight, connectionType, onlineStatus,
+                   pageUrl, pagePath, referrer)
+                   VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+                  [
+                      sessionId,
+                      static.userAgent,
+                      static.language,
+                      static.cookieEnabled,
+                      static.javaScriptEnabled,
+                      static.imagesEnabled,
+                      static.cssEnabled,
+                      static.screenDimensions.width,
+                      static.screenDimensions.height,
+                      static.screenDimensions.colorDepth,
+                      static.windowDimensions.width,
+                      static.windowDimensions.height,
+                      static.connectionType,
+                      static.onlineStatus,
+                      static.page.url,
+                      static.page.path,
+                      static.page.referrer
+                  ]
+              );
+              console.log(" Static data inserted:", result);
+          } catch (err) {
+              console.error(" Failed inserting static data:", err.message);
+          }
+      } else {
+          console.warn(" No static data received.");
       }
-    } else {
-      console.warn("⚠️ No staticBlock received.");
-    }
 
-    // Insert performance data
-    if (perfBlock) {
-      try {
-        const [result] = await db.query(
-          `INSERT INTO performance_data 
-          (session_id, pagePath, loadTime, domInteractive, domContentLoaded, collectedAt) 
-          VALUES (?, ?, ?, ?, ?, ?)`,
-          [
-            session_id,
-            perfBlock.pagePath,
-            perfBlock.loadTime,
-            perfBlock.domInteractive,
-            perfBlock.domContentLoaded,
-            perfBlock.collectedAt,
-          ]
-        );
-        console.log("✅ Performance data inserted:", result);
-      } catch (err) {
-        console.error("❌ Failed inserting performance data:", err.message);
+      // ---------------- Performance Data ---------------- //
+      if (performance) {
+          try {
+              const [result] = await db.query(
+                  `INSERT INTO performance_data
+                  (session_id, pagePath, loadTime, domInteractive, domContentLoaded, collectedAt)
+                  VALUES (?, ?, ?, ?, ?, ?)`,
+                  [
+                      sessionId,
+                      performance.page.path,
+                      performance.navigation?.loadTime || performance.totalLoadTime || 0,
+                      performance.navigation?.domInteractive || 0,
+                      performance.navigation?.domContentLoaded || 0,
+                      performance.collectedAt || Date.now()
+                  ]
+              );
+              console.log(" Performance data inserted:", result);
+          } catch (err) {
+              console.error(" Failed inserting performance data:", err.message);
+          }
+      } else {
+          console.warn(" No performance data received.");
       }
-    } else {
-      console.warn("⚠️ No perfBlock received.");
-    }
 
-    // Insert activity data
-    if (activities && activities.length > 0) {
-      console.log(`📊 ${activities.length} activity rows received.`);
-      for (const a of activities) {
-        try {
-          const [result] = await db.query(
-            `INSERT INTO activity_data (session_id, event, details, ts) VALUES (?, ?, ?, ?)`,
-            [session_id, a.event, JSON.stringify(a.details), a.ts]
-          );
-          console.log(`✅ Activity inserted (${a.event})`, result);
-        } catch (err) {
-          console.error(`❌ Failed inserting activity (${a.event}):`, err.message);
-        }
+      // ---------------- Activity Data ---------------- //
+      if (activity && activity.length > 0) {
+          console.log(` ${activity.length} activity rows received.`);
+          for (const a of activity) {
+              try {
+                  const [result] = await db.query(
+                      `INSERT INTO activity_data (session_id, event, details, ts)
+                       VALUES (?, ?, ?, ?)`,
+                      [sessionId, a.type, JSON.stringify(a), a.timestamp]
+                  );
+                  console.log(` Activity inserted (${a.type})`, result);
+              } catch (err) {
+                  console.error(` Failed inserting activity (${a.type}):`, err.message);
+              }
+          }
+      } else {
+          console.warn(" No activity data received.");
       }
-    } else {
-      console.warn("⚠️ No activities received.");
-    }
 
-    res.status(200).json({ message: "Analytics data received successfully" });
+      res.status(200).json({ message: "Analytics data received successfully" });
   } catch (err) {
-    console.error("🔥 Error saving analytics:", err);
-    res.status(500).json({ error: "Failed to save analytics" });
+      console.error(" Error saving analytics:", err);
+      res.status(500).json({ error: "Failed to save analytics" });
   }
 });
+
 
 // ---------------- START SERVER ---------------- //
 const PORT = 3000;
