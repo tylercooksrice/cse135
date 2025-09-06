@@ -1,5 +1,9 @@
 // app.js
 const express = require("express");
+const cors = require("cors");
+app.use(cors({
+  origin: "https://reporting.akhils.site"
+}));
 const bodyParser = require("body-parser");
 const path = require("path");
 const mysql = require("mysql2/promise");

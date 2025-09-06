@@ -1,8 +1,8 @@
 async function loadData() {
     try {
       const [activityRes, staticRes] = await Promise.all([
-        fetch("/api/activity"),
-        fetch("/api/static")
+        fetch("https://akhils.site/api/activity"),
+        fetch("https://akhils.site/api/static")
       ]);
   
       const activity = await activityRes.json();
