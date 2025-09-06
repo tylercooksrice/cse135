@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Reporting Dashboard</title>
+  <script src="https://cdn.zinggrid.com/zinggrid.min.js"></script>
+  <script src="https://cdn.zingchart.com/zingchart.min.js"></script>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <h1>📊 Reporting Dashboard</h1>
+
+  <div class="chart-container">
+    <h2>Metric 1: User Activity Over Time</h2>
+    <div id="lineChart"></div>
+  </div>
+
+  <div class="chart-container">
+    <h2>Metric 2: Page Views by Browser</h2>
+    <div id="barChart"></div>
+  </div>
+
+  <div class="chart-container">
+    <h2>Metric 3: Recent Error Logs</h2>
+    <zing-grid id="errorGrid"></zing-grid>
+  </div>
+
+  <!-- Load reporting logic -->
+  <script src="reporting.js"></script>
+</body>
+</html>
