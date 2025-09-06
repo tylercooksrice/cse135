@@ -1,6 +1,6 @@
 async function loadDetailedReport() {
     try {
-      const staticRes = await fetch("/api/static");
+      const staticRes = await fetch("https://reporting.akhils.site/api/static");
       const staticData = await staticRes.json();
   
       const returning = staticData.filter(s => s.referrer && s.referrer.includes(location.hostname)).length;
