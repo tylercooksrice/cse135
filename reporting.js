@@ -90,5 +90,6 @@ async function loadData() {
       }
     });
   }
-  Data();
+  
+  loadData();
   
