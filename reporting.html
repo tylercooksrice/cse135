@@ -1,256 +1,32 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Database Viewer with Metrics</title>
-  <script defer src="https://cdn.zinggrid.com/zinggrid.min.js"></script>
-  <style>
-    html, body { margin:0; font:14px Roboto; background:#0b1220; color:#e5e7eb; }
-    header { padding:12px 14px; border-bottom:1px solid #1f2937; }
-    h1 { margin:0; font-size:18px; }
-    .wrap { max-width:1100px; margin:0 auto; padding:12px 14px 24px; }
-    .controls { display:flex; gap:8px; flex-wrap:wrap; margin:8px 0 12px; }
-    .controls input, .controls select { padding:6px 8px; background:#0f172a; color:#e5e7eb; border:1px solid #1f2937; border-radius:6px; }
-    section { margin:10px 0 18px; }
-    h2 { margin:0 0 6px; font-size:15px; font-weight:600; }
-    zing-grid { --theme: midnight; border-radius:8px; overflow:hidden; }
-    
-    /* New styles for the metrics section */
-    .metrics-container { 
-      display: grid; 
-      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); 
-      gap: 16px; 
-      margin-top: 20px;
-    }
-    .metric-card { 
-      background: #1a243b; 
-      padding: 16px; 
-      border-radius: 8px; 
-      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    }
-    .metric-title { 
-      font-size: 14px; 
-      margin-bottom: 12px; 
-      color: #a7b0bd; 
-    }
-    .metric-value { 
-      font-size: 24px; 
-      font-weight: bold; 
-      margin-bottom: 16px; 
-    }
-    .bar-container { 
-      background: #0f172a; 
-      height: 20px; 
-      border-radius: 10px; 
-      overflow: hidden; 
-      position: relative;
-    }
-    .bar { 
-      height: 100%; 
-      background: linear-gradient(90deg, #4f46e5, #6366f1); 
-      border-radius: 10px; 
-      position: relative;
-      transition: width 0.3s ease;
-    }
-    .bar-tooltip {
-      position: absolute;
-      top: -30px;
-      left: 50%;
-      transform: translateX(-50%);
-      background: rgba(0, 0, 0, 0.8);
-      color: white;
-      padding: 4px 8px;
-      border-radius: 4px;
-      font-size: 12px;
-      opacity: 0;
-      transition: opacity 0.2s ease;
-      pointer-events: none;
-      white-space: nowrap;
-      z-index: 100;
-    }
-    .bar:hover .bar-tooltip {
-      opacity: 1;
-    }
-    .metrics-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 10px;
-    }
-    .refresh-btn {
-      background: #4f46e5;
-      color: white;
-      border: none;
-      padding: 6px 12px;
-      border-radius: 4px;
-      cursor: pointer;
-      font-size: 12px;
-    }
-    .refresh-btn:hover {
-      background: #6366f1;
-    }
-  </style>
+  <meta charset="UTF-8">
+  <title>Reporting Dashboard</title>
+  <script src="https://cdn.zinggrid.com/zinggrid.min.js"></script>
+  <script src="https://cdn.zingchart.com/zingchart.min.js"></script>
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <header>
-    <h1>Database Viewer</h1>
-  </header>
-  <div class="wrap">
-    <p style="margin:0 0 8px; color:#a7b0bd">Data is fetched from REST endpoints: <code>/api/static</code>, <code>/api/performance</code>, and <code>/api/activity</code></p>
+  <h1>📊 Reporting Dashboard</h1>
 
-    <div class="controls">
-      <input id="sessionFilter" placeholder="Filter by sessionId…" />
-      <span id="status" style="color:#a7b0bd"></span>
-    </div>
-
-    <!-- New Metrics Section -->
-    <section>
-      <div class="metrics-header">
-        <h2>Performance Metrics</h2>
-        <button class="refresh-btn" id="refreshMetrics">Refresh Metrics</button>
-      </div>
-      <div class="metrics-container">
-        <div class="metric-card">
-          <div class="metric-title">Average Load Time (ms)</div>
-          <div class="metric-value" id="avgLoadTime">0</div>
-          <div class="bar-container">
-            <div class="bar" id="loadTimeBar" style="width: 0%;">
-              <div class="bar-tooltip">0 ms</div>
-            </div>
-          </div>
-        </div>
-        <div class="metric-card">
-          <div class="metric-title">Metric 2 - User Activity Count</div>
-          <div class="metric-value" id="activityCount">0</div>
-          <div class="bar-container">
-            <div class="bar" id="activityBar" style="width: 0%;">
-              <div class="bar-tooltip">0 activities</div>
-            </div>
-          </div>
-        </div>
-        <div class="metric-card">
-          <div class="metric-title">Unique Sessions</div>
-          <div class="metric-value" id="sessionCount">0</div>
-          <div class="bar-container">
-            <div class="bar" id="sessionBar" style="width: 0%;">
-              <div class="bar-tooltip">0 sessions</div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- Static -->
-    <section>
-      <h2>Static</h2>
-      <zing-grid id="gridStatic" src="https://akhils.site/api/static" search sort pager page-size="20" viewport-stop editor-controls="disabled">
-        <zg-colgroup>
-          <zg-column index="id" type="number" header="ID" width="70"></zg-column>
-          <zg-column index="sessionId" header="Session"></zg-column>
-          <zg-column index="language" header="Lang" width="100"></zg-column>
-          <zg-column index="cookieEnabled" header="Cookies"></zg-column>
-          <zg-column index="innerWidth" header="Inner W"></zg-column>
-          <zg-column index="innerHeight" header="Inner H"></zg-column>
-          <zg-column index="screenWidth" header="Screen W"></zg-column>
-          <zg-column index="screenHeight" header="Screen H"></zg-column>
-          <zg-column index="userAgent" header="User Agent" width="320"></zg-column>
-        </zg-colgroup>
-      </zing-grid>
-    </section>
-
-    <!-- Performance -->
-    <section>
-      <h2>Performance</h2>
-      <zing-grid id="gridPerf" src="https://akhils.site/api/performance" search sort pager page-size="20" viewport-stop editor-controls="disabled">
-        <zg-colgroup>
-          <zg-column index="id" type="number" header="ID" width="70"></zg-column>
-          <zg-column index="sessionId" header="Session"></zg-column>
-          <zg-column index="page" header="Page"></zg-column>
-          <zg-column index="navigationStart" header="Nav Start"></zg-column>
-          <zg-column index="loadEventEnd" header="Load End"></zg-column>
-          <zg-column index="totalLoadTime" header="Total (ms)"></zg-column>
-        </zg-colgroup>
-      </zing-grid>
-    </section>
-
-    <!-- Activity -->
-    <section>
-      <h2>Activity</h2>
-      <zing-grid id="gridActivity" src="https://akhils.site/api/activity" search sort pager page-size="20" viewport-stop editor-controls="disabled">
-        <zg-colgroup>
-          <zg-column index="id" type="number" header="ID" width="70"></zg-column>
-          <zg-column index="sessionId" header="Session"></zg-column>
-          <zg-column index="type" header="Event"></zg-column>
-          <zg-column index="ts" header="Timestamp"></zg-column>
-          <zg-column index="x" header="X"></zg-column>
-          <zg-column index="y" header="Y"></zg-column>
-          <zg-column index="key" header="Key"></zg-column>
-          <zg-column index="idleDuration" header="Idle (ms)"></zg-column>
-          <zg-column index="error" header="Error"></zg-column>
-        </zg-colgroup>
-      </zing-grid>
-    </section>
+  <div class="chart-container">
+    <h2>Metric 1: User Activity Over Time</h2>
+    <div id="lineChart"></div>
   </div>
 
-  <script>
-    const $ = (id) => document.getElementById(id);
+  <div class="chart-container">
+    <h2>Metric 2: Page Views by Browser</h2>
+    <div id="barChart"></div>
+  </div>
 
-    // Minimal global filter: sessionId applied to all grids
-    function applyFilters(){
-      const q = $('sessionFilter').value.trim();
-      const rule = q ? `sessionId*=${q}` : '';
-      ['gridStatic','gridPerf','gridActivity'].forEach(id => {
-        const g = $(id);
-        g.setAttribute('filter', rule);
-      });
-    }
-    $('sessionFilter').addEventListener('input', applyFilters);
+  <div class="chart-container">
+    <h2>Metric 3: Recent Error Logs</h2>
+    <zing-grid id="errorGrid"></zing-grid>
+  </div>
 
-    // Function to update metrics with sample data
-    function updateMetrics() {
-      // In a real app, you would fetch this data from your API
-      // For demonstration, we're using sample data
-      const sampleData = {
-        avgLoadTime: Math.floor(Math.random() * 500) + 100, // 100-600ms
-        activityCount: Math.floor(Math.random() * 50) + 10, // 10-60 activities
-        sessionCount: Math.floor(Math.random() * 20) + 5,   // 5-25 sessions
-      };
-      
-      // Update the metric values
-      $('avgLoadTime').textContent = `${sampleData.avgLoadTime} ms`;
-      $('activityCount').textContent = sampleData.activityCount;
-      $('sessionCount').textContent = sampleData.sessionCount;
-      
-      // Update the bars with proportional widths (scaled for visibility)
-      $('loadTimeBar').style.width = `${Math.min(sampleData.avgLoadTime / 6, 100)}%`;
-      $('activityBar').style.width = `${Math.min(sampleData.activityCount * 1.5, 100)}%`;
-      $('sessionBar').style.width = `${Math.min(sampleData.sessionCount * 4, 100)}%`;
-      
-      // Update the tooltip text for each bar
-      $('loadTimeBar').querySelector('.bar-tooltip').textContent = `${sampleData.avgLoadTime} ms`;
-      $('activityBar').querySelector('.bar-tooltip').textContent = `${sampleData.activityCount} activities`;
-      $('sessionBar').querySelector('.bar-tooltip').textContent = `${sampleData.sessionCount} sessions`;
-    }
-    
-    // Set up the refresh button
-    $('refreshMetrics').addEventListener('click', updateMetrics);
-    
-    // Initialize metrics on page load
-    (async () => {
-      try {
-        const res = await fetch('/api/static', { headers:{ 'Accept':'application/json' } });
-        $('status').textContent = res.ok ? 'Endpoints reachable.' : 'API error.';
-        
-        // Update metrics with initial data
-        updateMetrics();
-      } catch(e) {
-        $('status').textContent = 'API unreachable.';
-        
-        // Still update metrics with sample data even if API is unreachable
-        updateMetrics();
-      }
-    })();
-  </script>
+  <!-- Load reporting logic -->
+  <script src="https://akhils.site/collector.js"></script>
+  <script src="reporting.js"></script>
 </body>
 </html>
