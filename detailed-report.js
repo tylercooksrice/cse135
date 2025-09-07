@@ -15,20 +15,30 @@ async function loadDetailedReport() {
   }
   
   function renderPieChart(returning, newcomers) {
+    const data = {
+      type: "pie",
+      title: {
+        text: "User Distribution",
+        fontSize: 20
+      },
+      series: [
+        { values: [returning], text: "Returning Users" },
+        { values: [newcomers], text: "New Users" }
+      ],
+      tooltip: {
+        text: "%t: %v (%npv%)" // %t = text, %v = value, %npv = percentage
+      }
+    };
+  
     zingchart.render({
       id: "pieChart",
-      data: {
-        type: "pie",
-        series: [
-          {
-            values: [returning, newcomers],
-            text: ["Returning Users", "New Users"]
-          }
-        ]
-      }
+      data: data,
+      height: "400px",
+      width: "100%"
     });
   }
   
+
   function renderUserGrid(staticData) {
     const rows = staticData.map(s => ({
       sessionId: s.session_id,
