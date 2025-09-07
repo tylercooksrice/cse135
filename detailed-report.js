@@ -15,15 +15,16 @@ async function loadDetailedReport() {
   }
   
   function renderPieChart(returning, newcomers) {
-    // Build the series array dynamically, skipping zero values
-    const series = [];
-    if (returning > 0) series.push({ values: [returning], text: "Returning Users" });
-    if (newcomers > 0) series.push({ values: [newcomers], text: "New Users" });
-  
-    // If both are 0, just show an empty chart
-    if (series.length === 0) {
-      document.getElementById("pieChart").innerHTML = "<p>No data available</p>";
-      return;
+    // Ensure there is at least one non-zero value
+    let series = [];
+    
+    if (returning > 0 || newcomers > 0) {
+      // Add only slices that are non-zero
+      if (returning > 0) series.push({ values: [returning], text: "Returning Users" });
+      if (newcomers > 0) series.push({ values: [newcomers], text: "New Users" });
+    } else {
+      // No data available, show a placeholder slice
+      series.push({ values: [1], text: "No Data" });
     }
   
     // Destroy old chart if it exists
