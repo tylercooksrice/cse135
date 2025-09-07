@@ -10,7 +10,7 @@ async function loadData() {
   
       renderLineChart(activity);
       renderBarChart(staticData);
-      renderMouseGrid(activity); // updated function
+      renderErrorGrid(activity);
     } catch (err) {
       console.error("Failed to load reporting data:", err);
     }
@@ -70,17 +70,13 @@ async function loadData() {
   }
   
   // Grid: recent error logs
-  function renderMouseGrid(activity) {
-    const mouseMoves = activity
-      .filter(a => a.type === "mousemove")
-      .slice(-20) // last 20 mouse moves
-      .map(e => ({
-        timestamp: new Date(e.timestamp).toLocaleString(),
-        x: e.x,
-        y: e.y
-      }));
+  function renderErrorGrid(activity) {
+    const errors = activity.filter(a => a.event === "error").slice(-20).map(e => ({
+      timestamp: new Date(e.ts).toLocaleString(),
+      details: e.details
+    }));
   
-    document.getElementById("mouseGrid").setAttribute("data", JSON.stringify(mouseMoves));
+    document.getElementById("errorGrid").setAttribute("data", JSON.stringify(errors));
   }
   
   loadData();
