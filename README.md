@@ -8,7 +8,7 @@ Akhil Subbaro
 acc: grader@178.128.179.204
 pwd: grader1234
 
-## Deployment Setup
+# Deployment Setup
 
 - Hosting: DigitalOcean Droplet
 - Source Control: GitHub
@@ -20,13 +20,13 @@ pwd: grader1234
   4. Site updates automatically.
 - See `Github-Deploy.mp4` for demo.
 
-## Link for Homework 2
+# Link for Homework 2
 [akhils.site](https://akhils.site/src/)
 
 
-## Homework 3 Checkpoint 3
+# Homework 3 Checkpoint 3
 
-### Dashboard
+## Dashboard
 
 For the **User Activity Trend**, we chose a line chart because it best represents changes over time. The activity data is collected as discrete events (such as clicks, scrolls, errors, or navigation actions), and aggregating these events by minute allows for a clear visualization of user engagement patterns. A line chart makes it easy to identify peaks of interaction, quiet periods, and potential correlations with other events such as errors or performance slowdowns. We considered using a bar chart but found that the continuous nature of activity data made a line representation more intuitive for identifying trends.
 
@@ -47,3 +47,4 @@ The line chart is paired with a grid that lists the underlying events. The grid 
 This report asks which browsers account for most sessions, and whether those browsers line up with errors or lower engagement. weuse a bar chart with browsers on the x axis and session counts on the y axis. A bar chart works well here because we are comparing categories and want to make relative differences clear. Bars make it easy to see that one browser dominates or that usage is spread across several families. A pie chart would be harder to read in cases where there are many categories or when the differences are modest. The bar chart forms a quick overview that guides testing and optimization priorities.
 
 To make the report actionable, weinclude a grid of sessions with environment details. The grid shows the session id, the browser family and version, the language, the connection type, the number of page views, and the error count. These fields allow a quick pass to see if a specific browser or version correlates with more failures or lower interaction. Sorting and filtering support targeted checks, such as showing only Safari sessions, or only sessions with one or more errors. The chart identifies the dominant platforms; the grid explains where reliability or usability issues may be concentrated. This combination helps decide where to invest engineering time. The file is linked from the dashboard as `browsers-report.html`.
+
