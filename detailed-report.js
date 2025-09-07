@@ -15,18 +15,24 @@ async function loadDetailedReport() {
   }
   
   function renderPieChart(returning, newcomers) {
+    // Destroy any existing chart first
+    if (zingchart.exec) {
+      try {
+        zingchart.exec('pieChart', 'destroy');
+      } catch(e) {
+        // Ignore if chart doesn't exist yet
+      }
+    }
+  
     const data = {
       type: "pie",
-      title: {
-        text: "User Distribution",
-        fontSize: 20
-      },
+      title: { text: "User Distribution", fontSize: 20 },
       series: [
         { values: [returning], text: "Returning Users" },
         { values: [newcomers], text: "New Users" }
       ],
       tooltip: {
-        text: "%t: %v (%npv%)" // %t = text, %v = value, %npv = percentage
+        text: "%t: %v (%npv%)"
       }
     };
   
@@ -37,6 +43,7 @@ async function loadDetailedReport() {
       width: "100%"
     });
   }
+  
   
 
   function renderUserGrid(staticData) {
