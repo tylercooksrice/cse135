@@ -10,7 +10,7 @@ async function loadData() {
   
       renderLineChart(activity);       // User activity over time
       renderBarChart(staticData);      // Browser distribution
-      renderPerformanceChart(staticData); // NEW performance metric
+      renderConnectionChart(staticData);
     } catch (err) {
       console.error("Failed to load reporting data:", err);
     }
@@ -70,36 +70,25 @@ async function loadData() {
   }
   
   // Line chart: average page load time per session
-  function renderPerformanceChart(staticData) {
-    const sessionLoadTimes = [];
-  
+  function renderConnectionChart(staticData) {
+    const counts = {};
     staticData.forEach(s => {
-      if (s.performance) {
-        const perf = s.performance.navigation || s.performance;
-        let loadTime = perf.loadTime || perf.totalLoadTime;
-        if (loadTime && loadTime > 0) {
-          sessionLoadTimes.push({
-            sessionId: s.sessionId,
-            loadTime: loadTime
-          });
-        }
-      }
+      const type = s.connectionType || "unknown";
+      counts[type] = (counts[type] || 0) + 1;
     });
   
-    const labels = sessionLoadTimes.map(s => s.sessionId.slice(-6)); // short session ids
-    const values = sessionLoadTimes.map(s => s.loadTime);
+    const labels = Object.keys(counts);
+    const values = Object.values(counts);
   
     zingchart.render({
-      id: "performanceChart",
+      id: "perfChart", // reuse your container
       data: {
-        type: "line",
-        title: { text: "Page Load Time per Session (ms)" },
+        type: "bar",
+        title: { text: "User Connection Types" },
         scaleX: { labels },
-        scaleY: { label: { text: "Load Time (ms)" } },
         series: [{ values }]
       }
     });
   }
-  
-  loadData();
+  Data();
   
