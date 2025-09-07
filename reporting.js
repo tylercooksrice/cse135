@@ -64,10 +64,7 @@ async function loadData() {
           {
             values // <-- counts for each browser
           }
-        ],
-        tooltip: {
-          text: "%kl" // show the x-axis label (browser name) on hover
-        }
+        ]
       }
     });
   }
