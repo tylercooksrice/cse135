@@ -52,5 +52,8 @@ This report asks which browsers account for most sessions, and whether those bro
 To make the report actionable, weinclude a grid of sessions with environment details. The grid shows the session id, the browser family and version, the language, the connection type, the number of page views, and the error count. These fields allow a quick pass to see if a specific browser or version correlates with more failures or lower interaction. Sorting and filtering support targeted checks, such as showing only Safari sessions, or only sessions with one or more errors. The chart identifies the dominant platforms; the grid explains where reliability or usability issues may be concentrated. This combination helps decide where to invest engineering time. 
 
 
+# Link for Homework 3 Checkpoint 3
+[reporting.akhils.site](https://reporting.akhils.site)
+[reporting.akhils.site/detailed-report](https://reporting.akhils.site/detailed-report.html)
 
 
