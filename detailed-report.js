@@ -20,8 +20,10 @@ async function loadDetailedReport() {
       data: {
         type: "pie",
         series: [
-          { text: "Returning Users", values: [returning] },
-          { text: "New Users", values: [newcomers] }
+          {
+            values: [returning, newcomers],
+            text: ["Returning Users", "New Users"]
+          }
         ]
       }
     });
