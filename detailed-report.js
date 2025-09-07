@@ -15,34 +15,33 @@ async function loadDetailedReport() {
   }
   
   function renderPieChart(returning, newcomers) {
-    // Destroy any existing chart first
-    if (zingchart.exec) {
-      try {
-        zingchart.exec('pieChart', 'destroy');
-      } catch(e) {
-        // Ignore if chart doesn't exist yet
-      }
+    // Build the series array dynamically, skipping zero values
+    const series = [];
+    if (returning > 0) series.push({ values: [returning], text: "Returning Users" });
+    if (newcomers > 0) series.push({ values: [newcomers], text: "New Users" });
+  
+    // If both are 0, just show an empty chart
+    if (series.length === 0) {
+      document.getElementById("pieChart").innerHTML = "<p>No data available</p>";
+      return;
     }
   
-    const data = {
-      type: "pie",
-      title: { text: "User Distribution", fontSize: 20 },
-      series: [
-        { values: [returning], text: "Returning Users" },
-        { values: [newcomers], text: "New Users" }
-      ],
-      tooltip: {
-        text: "%t: %v (%npv%)"
-      }
-    };
+    // Destroy old chart if it exists
+    try { zingchart.exec('pieChart', 'destroy'); } catch(e) {}
   
     zingchart.render({
       id: "pieChart",
-      data: data,
+      data: {
+        type: "pie",
+        title: { text: "User Distribution", fontSize: 20 },
+        series: series,
+        tooltip: { text: "%t: %v (%npv%)" }
+      },
       height: "400px",
       width: "100%"
     });
   }
+  
   
   
 
