@@ -50,23 +50,27 @@ async function loadData() {
       browserCounts[browser] = (browserCounts[browser] || 0) + 1;
     });
   
-    const series = Object.keys(browserCounts).map(b => ({
-      text: b,
-      values: [browserCounts[b]]
-    }));
+    const labels = Object.keys(browserCounts);
+    const values = Object.values(browserCounts);
   
     zingchart.render({
-        id: "barChart",
-        data: {
-          type: "bar",
-          series,
-          tooltip: {
-            text: "%t" // shows the "text" field of the series instead of value
+      id: "barChart",
+      data: {
+        type: "bar",
+        scaleX: {
+          labels // <-- browser names displayed along the x-axis
+        },
+        series: [
+          {
+            values // <-- counts for each browser
           }
+        ],
+        tooltip: {
+          text: "%kl" // show the x-axis label (browser name) on hover
         }
-      });
-    }
-    
+      }
+    });
+  }
   
   // Grid: recent error logs
   function renderErrorGrid(activity) {
