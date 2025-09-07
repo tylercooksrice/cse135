@@ -8,9 +8,9 @@ async function loadData() {
       const activity = await activityRes.json();
       const staticData = await staticRes.json();
   
-      renderLineChart(activity);
-      renderBarChart(staticData);
-      renderErrorGrid(activity);
+      renderLineChart(activity);       // User activity over time
+      renderBarChart(staticData);      // Browser distribution
+      renderPerformanceChart(staticData); // NEW performance metric
     } catch (err) {
       console.error("Failed to load reporting data:", err);
     }
@@ -20,7 +20,7 @@ async function loadData() {
   function renderLineChart(activity) {
     const timeBuckets = {};
     activity.forEach(a => {
-      const minute = new Date(a.ts).toISOString().slice(0,16); // minute precision
+      const minute = new Date(a.ts).toISOString().slice(0, 16); // minute precision
       timeBuckets[minute] = (timeBuckets[minute] || 0) + 1;
     });
   
@@ -58,25 +58,47 @@ async function loadData() {
       data: {
         type: "bar",
         scaleX: {
-          labels // <-- browser names displayed along the x-axis
+          labels // browser names displayed along the x-axis
         },
         series: [
           {
-            values // <-- counts for each browser
+            values // counts for each browser
           }
         ]
       }
     });
   }
   
-  // Grid: recent error logs
-  function renderErrorGrid(activity) {
-    const errors = activity.filter(a => a.event === "error").slice(-20).map(e => ({
-      timestamp: new Date(e.ts).toLocaleString(),
-      details: e.details
-    }));
+  // Line chart: average page load time per session
+  function renderPerformanceChart(staticData) {
+    const sessionLoadTimes = [];
   
-    document.getElementById("errorGrid").setAttribute("data", JSON.stringify(errors));
+    staticData.forEach(s => {
+      if (s.performance) {
+        const perf = s.performance.navigation || s.performance;
+        let loadTime = perf.loadTime || perf.totalLoadTime;
+        if (loadTime && loadTime > 0) {
+          sessionLoadTimes.push({
+            sessionId: s.sessionId,
+            loadTime: loadTime
+          });
+        }
+      }
+    });
+  
+    const labels = sessionLoadTimes.map(s => s.sessionId.slice(-6)); // short session ids
+    const values = sessionLoadTimes.map(s => s.loadTime);
+  
+    zingchart.render({
+      id: "performanceChart",
+      data: {
+        type: "line",
+        title: { text: "Page Load Time per Session (ms)" },
+        scaleX: { labels },
+        scaleY: { label: { text: "Load Time (ms)" } },
+        series: [{ values }]
+      }
+    });
   }
   
   loadData();
