@@ -56,10 +56,17 @@ async function loadData() {
     }));
   
     zingchart.render({
-      id: "barChart",
-      data: { type: "bar", series }
-    });
-  }
+        id: "barChart",
+        data: {
+          type: "bar",
+          series,
+          tooltip: {
+            text: "%t" // shows the "text" field of the series instead of value
+          }
+        }
+      });
+    }
+    
   
   // Grid: recent error logs
   function renderErrorGrid(activity) {
