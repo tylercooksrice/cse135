@@ -10,7 +10,7 @@ async function loadData() {
   
       renderLineChart(activity);
       renderBarChart(staticData);
-      renderErrorGrid(activity);
+      renderMouseGrid(activity); // updated function
     } catch (err) {
       console.error("Failed to load reporting data:", err);
     }
