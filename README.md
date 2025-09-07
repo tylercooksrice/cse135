@@ -37,6 +37,10 @@ For the **Error Logs**, I chose a data grid representation instead of a chart be
 
 ## Report
 
+### User Distribution
+
+The Detailed Report provides insights into user engagement by comparing returning and new users. A pie chart visually represents the proportion of returning versus new users, making it easy to understand user retention at a glance. Complementing this, a ZingGrid table displays raw session-level data, including session ID, language, browser, and referrer, allowing for detailed exploration and filtering. Together, these visualizations offer both a high-level summary and the ability to drill down into individual user sessions, supporting clear, user-centered analysis of retention and acquisition trends.
+
 ### User Activity Trend
 This report asks when does engagement spike, and which pages or actions are responsible for those spikes. We used a line chart that aggregates events by minute so the timeline is easy to read and trends are obvious. A line chart is a good fit because the activity stream is time based and the goal is to see how interaction rises and falls across a session window, rather than only looking at totals. Grouping events into one minute bins gives a clear signal without making the chart too noisy, and it keeps the scale consistent across different traffic levels. If needed, the chart can also include faint sub series for specific event types such as clicks or errors so that the viewer can spot whether a spike was driven by interaction or by failures.
 
