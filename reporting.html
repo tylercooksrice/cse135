@@ -15,10 +15,22 @@
     <div id="lineChart"></div>
   </div>
 
-  <div class="chart-container">
-    <h2>Metric 2: Page Views by Browser</h2>
-    <div id="barChart"></div>
-  </div>
+  <section>
+    <h2>Metric 2 Bar Chart</h2>
+    <zing-grid
+      id="metric2Grid"
+      src="/api/performance"
+      chart
+      chart-type="bar"
+      chart-x="page"
+      chart-y="totalLoadTime"
+      chart-tooltip="true"
+      chart-label="totalLoadTime"
+      chart-title="Metric 2: Total Load Time"
+      chart-color="#3b82f6"
+    >
+    </zing-grid>
+  </section>
 
   <div class="chart-container">
     <h2>Metric 3: Recent Error Logs</h2>
